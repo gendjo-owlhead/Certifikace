@@ -18,7 +18,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
     "@faker-js/faker": "^10.0.0",

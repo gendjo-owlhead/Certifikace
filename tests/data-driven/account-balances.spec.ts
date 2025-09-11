@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import { LoginPage } from '../../src/pages/login-page';
 import { DashboardPage } from '../../src/pages/dashboard-page';
 import { RegisterPage } from '../../src/pages/register-page';
-import accountBalancesData from '../../test-data/account-balances.json';
+import accountBalancesData from '../../test-data/account-balances.json' assert { type: 'json' };
 
 test.describe('Data Driven Tests - Account Balances', () => {
   accountBalancesData.accountBalances.forEach((balanceData, index) => {
