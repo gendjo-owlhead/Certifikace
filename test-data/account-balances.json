@@ -1,0 +1,29 @@
+{
+  "accountBalances": [
+    {
+      "balance": 0,
+      "description": "Zero balance account",
+      "expectedDisplay": "0 Kč"
+    },
+    {
+      "balance": 200000.52,
+      "description": "Positive balance with decimals",
+      "expectedDisplay": "200 000,52 Kč"
+    },
+    {
+      "balance": -12345,
+      "description": "Negative balance",
+      "expectedDisplay": "-12 345 Kč"
+    },
+    {
+      "balance": -196000921,
+      "description": "Large negative balance",
+      "expectedDisplay": "-196 000 921 Kč"
+    },
+    {
+      "balance": 298000123,
+      "description": "Large positive balance",
+      "expectedDisplay": "298 000 123 Kč"
+    }
+  ]
+}
