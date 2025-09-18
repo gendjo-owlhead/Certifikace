@@ -1,10 +1,4 @@
-# TEG#B Playwright Certification Testing Suite
-
-Testovací projekt pro aplikaci TEG#B (bankovní aplikace) vytvořený v rámci Playwright certifikace.
-
-## Zadání úlohy
-
-Projekt obsahuje následující typy testů podle zadání:
+# Projekt obsahuje následující typy testů podle zadání:
 
 1. **E2E Test** - Kompletní uživatelský flow
 2. **API Test** - Test přihlašovacího API
