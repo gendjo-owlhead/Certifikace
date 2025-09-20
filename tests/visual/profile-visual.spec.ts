@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../src/pages/login-page';
-import { DashboardPage } from '../../src/pages/dashboard-page';
-import { TEST_USERS } from '../../src/utils/test-data';
+import { LoginPage } from '../../src/pages/login-page.js';
+import { DashboardPage } from '../../src/pages/dashboard-page.js';
+import { TEST_USERS } from '../../src/utils/test-data.js';
 import AxeBuilder from '@axe-core/playwright';
 
 test.describe('Visual Tests - Profile', () => {
