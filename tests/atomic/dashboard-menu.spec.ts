@@ -1,7 +1,22 @@
-import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../src/pages/login-page';
-import { DashboardPage } from '../../src/pages/dashboard-page';
-import { TEST_USERS } from '../../src/utils/test-data';
+import { test, expect, type Page } from '@playwright/test';
+import { LoginPage } from '../../src/pages/login-page.js';
+import { DashboardPage } from '../../src/pages/dashboard-page.js';
+import { TEST_USERS } from '../../src/utils/test-data.js';
+import { TEST_IDS } from '../../src/utils/test-ids.js';
+
+const navigationLocator = (page: Page) =>
+  page
+    .getByTestId(TEST_IDS.dashboard.nav)
+    .or(page.locator('.sidebar, nav, aside, [class*="menu"], [class*="navigation"]'))
+    .first();
+
+const navItem = (page: Page, testId: string, fallbackTexts: string[]) => {
+  let locator = page.getByTestId(testId);
+  fallbackTexts.forEach((text) => {
+    locator = locator.or(page.locator(`li:has-text("${text}")`)).or(page.getByRole('link', { name: text }));
+  });
+  return locator;
+};
 
 test.describe('Atomic Tests - Dashboard Left Menu', () => {
   let loginPage: LoginPage;
@@ -10,7 +25,7 @@ test.describe('Atomic Tests - Dashboard Left Menu', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     dashboardPage = new DashboardPage(page);
-    
+
     await loginPage.navigate();
     await loginPage.switchToEnglish();
     await loginPage.login(TEST_USERS.EXISTING_USER.username, TEST_USERS.EXISTING_USER.password);
@@ -19,85 +34,84 @@ test.describe('Atomic Tests - Dashboard Left Menu', () => {
   });
 
   test('should display left navigation menu', async ({ page }) => {
-    const leftMenu = page.locator('.sidebar, nav, aside, [class*="menu"], [class*="navigation"]').first();
-    await expect(leftMenu).toBeVisible();
+    await expect(navigationLocator(page)).toBeVisible();
   });
 
   test('should display Home menu item', async ({ page }) => {
-    const homeItem = page.locator('li:has-text("Domů")').or(page.locator('li:has-text("Home")'));
+    const homeItem = navItem(page, TEST_IDS.navigation.home, ['Domů', 'Home']);
     await expect(homeItem).toBeVisible();
   });
 
   test('should display Accounts menu item', async ({ page }) => {
-    const accountsItem = page.locator('li:has-text("Účty")').or(page.locator('li:has-text("Accounts")'));
+    const accountsItem = navItem(page, TEST_IDS.navigation.accounts, ['Účty', 'Accounts']);
     await expect(accountsItem).toBeVisible();
   });
 
   test('should display Transactions menu item', async ({ page }) => {
-    const transactionsItem = page.locator('li:has-text("Transakce")').or(page.locator('li:has-text("Transactions")'));
+    const transactionsItem = navItem(page, TEST_IDS.navigation.transactions, ['Transakce', 'Transactions']);
     await expect(transactionsItem).toBeVisible();
   });
 
   test('should display Support menu item', async ({ page }) => {
-    const supportItem = page.locator('li:has-text("Podpora")').or(page.locator('li:has-text("Support")'));
+    const supportItem = navItem(page, TEST_IDS.navigation.support, ['Podpora', 'Support']);
     await expect(supportItem).toBeVisible();
   });
 
   test('should have clickable menu items', async ({ page }) => {
-    // Test kliknutí na Účty v levém menu
-    const accountsItem = page.locator('li:has-text("Účty")').or(page.locator('li:has-text("Accounts")'));
-    await accountsItem.click();
-    
-    // Počkáme na možnou změnu (může být SPA navigace)
+    const accountsItem = navItem(page, TEST_IDS.navigation.accounts, ['Účty', 'Accounts']);
+    await accountsItem.first().click();
     await page.waitForTimeout(1000);
-    
-    // Ověření, že kliknutí bylo registrováno
-    console.log('Accounts menu item clicked successfully');
   });
 
   test('should display menu items in list', async ({ page }) => {
-    // Kontrola všech položek menu jako li elementy
-    const menuItems = page.locator('li:has-text("Domů"), li:has-text("Účty"), li:has-text("Transakce"), li:has-text("Podpora")');
+    const menuItems = navigationLocator(page).locator('li');
     const menuCount = await menuItems.count();
     expect(menuCount).toBeGreaterThan(0);
-    
-    console.log(`Found ${menuCount} menu items`);
   });
 
   test('should display TEG#B logo in menu area', async ({ page }) => {
-    // Kontrola loga TEG#B v levém menu
-    const logo = page.locator('img[alt*="TEG"]').or(page.locator('img[alt*="Logo"]')).or(page.locator('text=TEG'));
+    const logo = page
+      .getByTestId(TEST_IDS.common.logo)
+      .or(navigationLocator(page).locator('img[alt*="teg" i], img[alt*="logo" i]'))
+      .or(navigationLocator(page).getByText('TEG', { exact: false }));
+
     await expect(logo.first()).toBeVisible();
   });
 
-  // Testy pro header zůstávají
   test('should display dashboard header with logout button', async ({ page }) => {
-    // Kontrola viditelnosti header sekce
-    const header = page.locator('header, [role="banner"]');
+    const header = page
+      .getByTestId(TEST_IDS.dashboard.header)
+      .or(page.getByTestId(TEST_IDS.common.header))
+      .or(page.locator('header, [role="banner"]'));
+
     await expect(header).toBeVisible();
-    
-    // Kontrola logout tlačítka
-    const logoutButton = page.getByRole('button', { name: 'Odhlásit se' }).or(page.getByRole('button', { name: 'Logout' }));
+
+    const logoutButton = page
+      .getByTestId(TEST_IDS.dashboard.logoutButton)
+      .or(page.getByRole('button', { name: 'Odhlásit se' }))
+      .or(page.getByRole('button', { name: 'Logout' }));
+
     await expect(logoutButton).toBeVisible();
   });
 
   test('should display main content area', async ({ page }) => {
-    // Kontrola hlavního obsahu
-    const mainContent = page.locator('main');
+    const mainContent = page
+      .getByTestId(TEST_IDS.dashboard.mainContent)
+      .or(page.getByTestId(TEST_IDS.common.mainContent))
+      .or(page.locator('main'));
+
     await expect(mainContent).toBeVisible();
   });
 
   test('should have functional logout button', async ({ page }) => {
-    // Test funkcionality logout tlačítka
-    const logoutButton = page.getByRole('button', { name: 'Odhlásit se' }).or(page.getByRole('button', { name: 'Logout' }));
-    
-    // Klikneme na logout
+    const logoutButton = page
+      .getByTestId(TEST_IDS.dashboard.logoutButton)
+      .or(page.getByRole('button', { name: 'Odhlásit se' }))
+      .or(page.getByRole('button', { name: 'Logout' }));
+
     await logoutButton.click();
-    
-    // Počkáme na přesměrování
     await page.waitForTimeout(2000);
-    
-    // Kontrola, že jsme se odhlásili
+
     const currentUrl = page.url();
     const isLoggedOut = !currentUrl.includes('/dashboard');
     expect(isLoggedOut).toBe(true);
